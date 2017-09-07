@@ -26,7 +26,7 @@ static byte num[3] = {0, 0, 0};
 static byte decimal = 1;
 
 // digit 8 segment lookups
-char digit3[10][6] = {                   // from https://en.wikipedia.org/wiki/Seven-segment_display
+char digit3[11][6] = {                   // from https://en.wikipedia.org/wiki/Seven-segment_display
                    { 0, 0xbb,0,0,0,0  }, // zero, a,b,c,d,e,f,/g
                    { 0, 0x11, 0,0,0,0 }, // one /a,b,c,/d,/e,/f,/g
                    { 0, 0x9e, 0,0,0,0 }, // two a,b,/c,d,e,/f,g
@@ -37,9 +37,10 @@ char digit3[10][6] = {                   // from https://en.wikipedia.org/wiki/S
                    { 0, 0x91, 0,0,0,0 }, // seven a,b,c,/d,/e,/f,/g
                    { 0, 0xbf, 0,0,0,0 }, // eight a,b,c,d,e,f,g
                    { 0, 0xb7, 0,0,0,0 }, // nine a,b,c,d,/e,f,g
+                   { 0, 0x00, 0,0,0,0 }, // nine a,b,c,d,/e,f,g
                  };
                  
-char digit2[10][6] = {                   // from https://en.wikipedia.org/wiki/Seven-segment_display
+char digit2[11][6] = {                   // from https://en.wikipedia.org/wiki/Seven-segment_display
                    { 0xee, 0, 0,0,0,0  },// zero, a,b,c,d,e,f,/g
                    { 0x44, 0, 0,0,0,0 }, // one /a,b,c,/d,/e,/f,/g
                    { 0xb6, 0, 0,0,0,0 }, // two a,b,/c,d,e,/f,g
@@ -50,9 +51,10 @@ char digit2[10][6] = {                   // from https://en.wikipedia.org/wiki/S
                    { 0x46, 0, 0,0,0,0 }, // seven a,b,c,/d,/e,/f,/g
                    { 0xfe, 0, 0,0,0,0 }, // eight a,b,c,d,e,f,g
                    { 0xde, 0, 0,0,0,0 }, // nine a,b,c,d,/e,f,g
+                   { 0x00, 0, 0,0,0,0 }, // nine a,b,c,d,/e,f,g
                  };
                  
-char digit1[10][6] = {                      // from https://en.wikipedia.org/wiki/Seven-segment_display
+char digit1[11][6] = {                      // from https://en.wikipedia.org/wiki/Seven-segment_display
                    { 0, 0, 0,0,0x2e,0xc0 }, // zero, a,b,c,d,e,f,/g
                    { 0, 0, 0,0,0x04,0x40 }, // one /a,b,c,/d,/e,/f,/g
                    { 0, 0, 0,0,0x27,0x80 }, // two a,b,/c,d,e,/f,g
@@ -63,6 +65,7 @@ char digit1[10][6] = {                      // from https://en.wikipedia.org/wik
                    { 0, 0, 0,0,0x24,0x40 }, // seven a,b,c,/d,/e,/f,/g
                    { 0, 0, 0,0,0x2f,0xc0 }, // eight a,b,c,d,e,f,g
                    { 0, 0, 0,0,0x2d,0xc0 }, // nine a,b,c,d,/e,f,g
+                   { 0, 0, 0,0,0x00,0x00 }, // nine a,b,c,d,/e,f,g
                  };
 
 void setup()
@@ -158,8 +161,15 @@ void depth_to_num(float depth, byte num[3], byte decimal) {
   }
 
   if(depth !=0){
-      if((int)depth/100%10 > 0) num[2] = (int)depth/100%10;
-      if((int)depth/10%10 > 0 | (int)depth/100%10 > 0 | decimal) num[1] = (int)depth/10%10;
+      if((int)depth/100%10 > 0){ num[2] = (int)depth/100%10;
+      }else{
+        num[2] = 10; // to blank it
+      }
+      if((int)depth/10%10 > 0 | (int)depth/100%10 > 0 | decimal){
+        num[1] = (int)depth/10%10;
+      }else{
+        num[1] = 10; // to blank it
+      }
       num[0] = (int)depth/1%10;
   }
 }
