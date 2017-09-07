@@ -138,6 +138,21 @@ void I2C_talk_to_clipper(char *data)
 
 
 
+void depth_to_num(float depth, byte num[3], byte decimal) {
+  if(depth < 0) depth = 0;
+
+  if((int)depth/100%10 == 0){
+    depth = depth * 10;
+    decimal = 1;
+  }else{
+    decimal = 0;
+  }
+
+  if(depth !=0){
+      if((int)depth/100%10 > 0) num[0] = (int)depth/100%10;
+      if((int)depth/10%10 > 0 | (int)depth/100%10 > 0 | decimal) num[1] = (int)depth/10%10;
+      num[2] = (int)depth/1%10;
+  }
 
 void loop()
 {
