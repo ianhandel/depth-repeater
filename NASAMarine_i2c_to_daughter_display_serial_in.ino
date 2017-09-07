@@ -199,7 +199,7 @@ void write_depth_invalid(){
 void write_depth_valid(){
   depthBelowKeel = atof(depthBT.value()) + atof(depthOFFSET.value());
   
-  depth_to_num(depthBelowKeel, num);
+  depth_to_num(depthBelowKeel, num, decimal);
   
   // Convert num[3] into cl_data for writing to repeater
   cl_data[6] = digit3[num[0]][0]  | digit2[num[1]][0] | digit1[num[2]][0];
