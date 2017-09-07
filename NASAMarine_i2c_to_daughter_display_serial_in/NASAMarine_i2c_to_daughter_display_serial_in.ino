@@ -160,7 +160,7 @@ void depth_to_num(float depth, byte num[3], byte decimal) {
     decimal = 0;
   }
 
-  if(depth !=0){
+  if(true){
       if((int)depth/100%10 > 0){ num[2] = (int)depth/100%10;
       }else{
         num[2] = 10; // to blank it
@@ -233,4 +233,18 @@ void write_depth_valid(){
 }
 
 
-//$SDDPT,10.1,-1.5,*62
+/*
+ 
+$SDDPT,10.1,-1.5,*62
+$SDDPT,100.7,-1.7,*56
+$SDDPT,0.7,-1.5,*55
+$SDDPT,11.7,-1.5,*65
+$SDDPT,78,-1.5,*73
+$SDDPT,198.7,-1.5,*55
+$SDDPT,1.5,-1.5,*56
+
+*/
+
+
+
+
