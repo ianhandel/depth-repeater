@@ -1,5 +1,4 @@
 #include <TinyGPS++.h>
-
 TinyGPSPlus gps;
 
 TinyGPSCustom depthBT(gps, "SDDPT", 1);
@@ -14,6 +13,48 @@ static char cl_data[12] = {0x7c,0xce,0x80,0xe0,0xf8,0x70,0x00,0x00,0x00,0x00,0x0
 static char no_data[12] = {0x7c,0xce,0x80,0xe0,0xf8,0x70,0x10,0x04,0x00,0x00,0x01,0x00};
 static float depthBelowKeel = 0;
 static long lastDepth = millis() - OK_WAIT;
+static byte num[3] = {0, 0, 0};
+static byte decimal = 1;
+
+// digit 8 segment lookups
+char digit3[10][6] = {                   // from https://en.wikipedia.org/wiki/Seven-segment_display
+                   { 0, 0xbb,0,0,0,0  }, // zero, a,b,c,d,e,f,/g
+                   { 0, 0x11, 0,0,0,0 }, // one /a,b,c,/d,/e,/f,/g
+                   { 0, 0x9e, 0,0,0,0 }, // two a,b,/c,d,e,/f,g
+                   { 0, 0x97, 0,0,0,0 }, // three a,b,c,d,/e,/f,g
+                   { 0, 0x35, 0,0,0,0 }, // four /a,b,c,/d,/e,f,g
+                   { 0, 0xa7, 0,0,0,0 }, // five a,/b,c,d,/e,f,g
+                   { 0, 0xaf, 0,0,0,0 }, // six a,/b,c,d,e,f,g
+                   { 0, 0x91, 0,0,0,0 }, // seven a,b,c,/d,/e,/f,/g
+                   { 0, 0xbf, 0,0,0,0 }, // eight a,b,c,d,e,f,g
+                   { 0, 0xb7, 0,0,0,0 }, // nine a,b,c,d,/e,f,g
+                 };
+                 
+char digit2[10][6] = {                   // from https://en.wikipedia.org/wiki/Seven-segment_display
+                   { 0xee, 0, 0,0,0,0  },// zero, a,b,c,d,e,f,/g
+                   { 0x44, 0, 0,0,0,0 }, // one /a,b,c,/d,/e,/f,/g
+                   { 0xb6, 0, 0,0,0,0 }, // two a,b,/c,d,e,/f,g
+                   { 0xd6, 0, 0,0,0,0 }, // three a,b,c,d,/e,/f,g
+                   { 0x5c, 0, 0,0,0,0 }, // four /a,b,c,/d,/e,f,g
+                   { 0xda, 0, 0,0,0,0 }, // five a,/b,c,d,/e,f,g
+                   { 0xfa, 0, 0,0,0,0 }, // six a,/b,c,d,e,f,g
+                   { 0x46, 0, 0,0,0,0 }, // seven a,b,c,/d,/e,/f,/g
+                   { 0xfe, 0, 0,0,0,0 }, // eight a,b,c,d,e,f,g
+                   { 0xde, 0, 0,0,0,0 }, // nine a,b,c,d,/e,f,g
+                 };
+                 
+char digit1[10][6] = {                      // from https://en.wikipedia.org/wiki/Seven-segment_display
+                   { 0, 0, 0,0,0x2e,0xc0 }, // zero, a,b,c,d,e,f,/g
+                   { 0, 0, 0,0,0x04,0x40 }, // one /a,b,c,/d,/e,/f,/g
+                   { 0, 0, 0,0,0x27,0x80 }, // two a,b,/c,d,e,/f,g
+                   { 0, 0, 0,0,0x25,0xC0 }, // three a,b,c,d,/e,/f,g
+                   { 0, 0, 0,0,0x0d,0x40 }, // four /a,b,c,/d,/e,f,g
+                   { 0, 0, 0,0,0x29,0xC0 }, // five a,/b,c,d,/e,f,g
+                   { 0, 0, 0,0,0x2b,0xC0 }, // six a,/b,c,d,e,f,g
+                   { 0, 0, 0,0,0x24,0x40 }, // seven a,b,c,/d,/e,/f,/g
+                   { 0, 0, 0,0,0x2f,0xc0 }, // eight a,b,c,d,e,f,g
+                   { 0, 0, 0,0,0x2d,0xc0 }, // nine a,b,c,d,/e,f,g
+                 };
 
 void setup()
 {
@@ -23,7 +64,6 @@ void setup()
   digitalWrite(I2C_SDA, HIGH);   // sets the pin on
   Serial.begin(4800);
 }
-
 
 void I2C_start()
 {
@@ -97,69 +137,10 @@ void I2C_talk_to_clipper(char *data)
 
 
 
-char digit3[10][6] = {                   // from https://en.wikipedia.org/wiki/Seven-segment_display
-                   { 0, 0xbb,0,0,0,0  }, // zero, a,b,c,d,e,f,/g
-                   { 0, 0x11, 0,0,0,0 }, // one /a,b,c,/d,/e,/f,/g
-                   { 0, 0x9e, 0,0,0,0 }, // two a,b,/c,d,e,/f,g
-                   { 0, 0x97, 0,0,0,0 }, // three a,b,c,d,/e,/f,g
-                   { 0, 0x35, 0,0,0,0 }, // four /a,b,c,/d,/e,f,g
-                   { 0, 0xa7, 0,0,0,0 }, // five a,/b,c,d,/e,f,g
-                   { 0, 0xaf, 0,0,0,0 }, // six a,/b,c,d,e,f,g
-                   { 0, 0x91, 0,0,0,0 }, // seven a,b,c,/d,/e,/f,/g
-                   { 0, 0xbf, 0,0,0,0 }, // eight a,b,c,d,e,f,g
-                   { 0, 0xb7, 0,0,0,0 }, // nine a,b,c,d,/e,f,g
-                 };
-                 
-char digit2[10][6] = {                   // from https://en.wikipedia.org/wiki/Seven-segment_display
-                   { 0xee, 0, 0,0,0,0  },// zero, a,b,c,d,e,f,/g
-                   { 0x44, 0, 0,0,0,0 }, // one /a,b,c,/d,/e,/f,/g
-                   { 0xb6, 0, 0,0,0,0 }, // two a,b,/c,d,e,/f,g
-                   { 0xd6, 0, 0,0,0,0 }, // three a,b,c,d,/e,/f,g
-                   { 0x5c, 0, 0,0,0,0 }, // four /a,b,c,/d,/e,f,g
-                   { 0xda, 0, 0,0,0,0 }, // five a,/b,c,d,/e,f,g
-                   { 0xfa, 0, 0,0,0,0 }, // six a,/b,c,d,e,f,g
-                   { 0x46, 0, 0,0,0,0 }, // seven a,b,c,/d,/e,/f,/g
-                   { 0xfe, 0, 0,0,0,0 }, // eight a,b,c,d,e,f,g
-                   { 0xde, 0, 0,0,0,0 }, // nine a,b,c,d,/e,f,g
-                 };
-                 
-char digit1[10][6] = {                      // from https://en.wikipedia.org/wiki/Seven-segment_display
-                   { 0, 0, 0,0,0x2e,0xc0 }, // zero, a,b,c,d,e,f,/g
-                   { 0, 0, 0,0,0x04,0x40 }, // one /a,b,c,/d,/e,/f,/g
-                   { 0, 0, 0,0,0x27,0x80 }, // two a,b,/c,d,e,/f,g
-                   { 0, 0, 0,0,0x25,0xC0 }, // three a,b,c,d,/e,/f,g
-                   { 0, 0, 0,0,0x0d,0x40 }, // four /a,b,c,/d,/e,f,g
-                   { 0, 0, 0,0,0x29,0xC0 }, // five a,/b,c,d,/e,f,g
-                   { 0, 0, 0,0,0x2b,0xC0 }, // six a,/b,c,d,e,f,g
-                   { 0, 0, 0,0,0x24,0x40 }, // seven a,b,c,/d,/e,/f,/g
-                   { 0, 0, 0,0,0x2f,0xc0 }, // eight a,b,c,d,e,f,g
-                   { 0, 0, 0,0,0x2d,0xc0 }, // nine a,b,c,d,/e,f,g
-                 };
+
 
 void loop()
 {
-  static byte num[3] = {0, 0, 0};
-  static byte decimal = 1;
-  
-    cl_data[6] = digit3[num[0]][0]  | digit2[num[1]][0] | digit1[num[2]][0];
-    cl_data[7] = digit3[num[0]][1]  | digit2[num[1]][1] | digit1[num[2]][1];
-    cl_data[8] = digit3[num[0]][2]  | digit2[num[1]][2] | digit1[num[2]][2];
-    cl_data[9] = digit3[num[0]][3]  | digit2[num[1]][3] | digit1[num[2]][3];
-    cl_data[10] = digit3[num[0]][4] | digit2[num[1]][4] | digit1[num[2]][4];
-    cl_data[11] = digit3[num[0]][5] | digit2[num[1]][5] | digit1[num[2]][5];
-
-    // depth
-    cl_data[6] = cl_data[6] | 0x01;
-    // dp
-    if(decimal == 1){
-      cl_data[9] = cl_data[9] | 0x80;
-    }
-
-    num[0] = (num[0] + 1) % 10;
-    num[1] = (num[1] + 1) % 10;
-    num[2] = (num[2] + 1) % 10;
-
-
 
 
      /*
@@ -177,24 +158,54 @@ void loop()
     }
 
     if(millis() - lastDepth > OK_WAIT){
-      depthBelowKeel = 0;
-      I2C_talk_to_clipper(no_data);
-      delay(250);
-      I2C_talk_to_clipper(no_data);
-      delay(250);
+      write_invalid();
     }else{
-     depthBelowKeel = atof(depthBT.value()) + atof(depthOFFSET.value());
-     I2C_talk_to_clipper(cl_data);
-     delay(250);
-     I2C_talk_to_clipper(cl_data);
-     delay(250);
+     write_valid();
     }
 
-     Serial.println(depthBelowKeel);
-     Serial.println(millis() - lastDepth);
-     Serial.println("");
+    Serial.println(depthBelowKeel);
+    Serial.println(millis() - lastDepth);
+    Serial.println("");
+  
+
+  
+  
+
 }     
 
+void write_depth_invalid(){
+  depthBelowKeel = 0;
+  I2C_talk_to_clipper(no_data);
+  delay(250);
+  I2C_talk_to_clipper(no_data);
+  delay(250);
+}
+
+void write_depth_valid(){
+  depthBelowKeel = atof(depthBT.value()) + atof(depthOFFSET.value());
+  
+  depth_to_num(depthBelowKeel, num);
+  
+  // Convert num[3] into cl_data for writing to repeater
+  cl_data[6] = digit3[num[0]][0]  | digit2[num[1]][0] | digit1[num[2]][0];
+  cl_data[7] = digit3[num[0]][1]  | digit2[num[1]][1] | digit1[num[2]][1];
+  cl_data[8] = digit3[num[0]][2]  | digit2[num[1]][2] | digit1[num[2]][2];
+  cl_data[9] = digit3[num[0]][3]  | digit2[num[1]][3] | digit1[num[2]][3];
+  cl_data[10] = digit3[num[0]][4] | digit2[num[1]][4] | digit1[num[2]][4];
+  cl_data[11] = digit3[num[0]][5] | digit2[num[1]][5] | digit1[num[2]][5];
+
+  // depth
+  cl_data[6] = cl_data[6] | 0x01;
+  // decimal point
+  if(decimal == 1){
+    cl_data[9] = cl_data[9] | 0x80;
+  }
+  
+  I2C_talk_to_clipper(cl_data);
+  delay(250);
+  I2C_talk_to_clipper(cl_data);
+  delay(250);
+}
 
 
 //$SDDPT,10.1,-1.5,*62
