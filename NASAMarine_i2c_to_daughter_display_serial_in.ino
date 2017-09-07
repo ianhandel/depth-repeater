@@ -156,17 +156,8 @@ void depth_to_num(float depth, byte num[3], byte decimal) {
 
 void loop()
 {
-
-
-     /*
-     char nmea[] = "$SDDPT,10.1,-1.5,*62\r\n";
-
-     for(int ii = 0; ii<22; ii++){
-           gps.encode(nmea[ii]);
-     }
-     */
-       while (Serial.available() > 0)
-    gps.encode(Serial.read());
+    while (Serial.available() > 0)
+      gps.encode(Serial.read());
 
     if(depthBT.isUpdated() & depthOFFSET.isUpdated()){
       lastDepth = millis(); 
