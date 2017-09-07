@@ -19,11 +19,12 @@ int I2C_SCL = 12;
 int I2C_SDA = 3;                 
 
 static char cl_data[12] = {0x7c,0xce,0x80,0xe0,0xf8,0x70,0x00,0x00,0x00,0x00,0x00,0x00};
+static char blank_data[12] = {0x7c,0xce,0x80,0xe0,0xf8,0x70,0x00,0x00,0x00,0x00,0x00,0x00};
 static char no_data[12] = {0x7c,0xce,0x80,0xe0,0xf8,0x70,0x10,0x04,0x00,0x00,0x01,0x00};
-static float depthBelowKeel = 0;
 static long lastDepth = millis() - OK_WAIT;
 static byte num[3] = {0, 0, 0};
 static byte decimal = 1;
+static float depth;
 
 // digit 8 segment lookups
 char digit3[11][6] = {                   // from https://en.wikipedia.org/wiki/Seven-segment_display
@@ -147,31 +148,28 @@ void I2C_talk_to_clipper(char *data)
   I2C_stop();
 }
 
-
-
-
-void depth_to_num(float depth, byte num[3], byte decimal) {
+void depth_to_num() {  
   if(depth < 0) depth = 0;
 
-  if((int)depth/100%10 == 0){
+  if(((int)depth/100)%10 == 0){
     depth = depth * 10;
     decimal = 1;
   }else{
     decimal = 0;
   }
 
-  if(true){
-      if((int)depth/100%10 > 0){ num[2] = (int)depth/100%10;
-      }else{
-        num[2] = 10; // to blank it
-      }
-      if((int)depth/10%10 > 0 | (int)depth/100%10 > 0 | decimal){
-        num[1] = (int)depth/10%10;
-      }else{
-        num[1] = 10; // to blank it
-      }
-      num[0] = (int)depth/1%10;
-  }
+
+    if((int)depth/100%10 > 0){
+      num[2] = ((int)depth/100)%10;
+    }else{
+      num[2] = 10; // to blank it
+    }
+    if((int)depth/10%10 > 0 | ((int)depth/100)%10 > 0 | decimal){
+      num[1] = ((int)depth/10)%10;
+    }else{
+      num[1] = 10; // to blank it
+    }
+    num[0] = ((int)depth/1)%10;
 }
 
 void loop(){
@@ -183,23 +181,14 @@ void loop(){
     }
 
     if(millis() - lastDepth > OK_WAIT){
-      write_depth_invalid();
+     write_depth_invalid();
     }else{
      write_depth_valid();
-    }
-
-    Serial.println(depthBelowKeel);
-    Serial.println(millis() - lastDepth);
-    Serial.println("");
-  
-
-  
-  
-
+    }  
 }     
 
 void write_depth_invalid(){
-  depthBelowKeel = 0;
+  depth = 0;
   I2C_talk_to_clipper(no_data);
   delay(250);
   I2C_talk_to_clipper(no_data);
@@ -207,9 +196,8 @@ void write_depth_invalid(){
 }
 
 void write_depth_valid(){
-  depthBelowKeel = atof(depthBT.value()) + atof(depthOFFSET.value());
-  
-  depth_to_num(depthBelowKeel, num, decimal);
+  depth = atof(depthBT.value()) + atof(depthOFFSET.value());
+  depth_to_num();
   
   // Convert num[3] into cl_data for writing to repeater
   cl_data[6] = digit3[num[0]][0]  | digit2[num[1]][0] | digit1[num[2]][0];
@@ -225,16 +213,16 @@ void write_depth_valid(){
   if(decimal == 1){
     cl_data[9] = cl_data[9] | 0x80;
   }
-  
+
+//  I2C_talk_to_clipper(blank_data);
+//  delay(40);
   I2C_talk_to_clipper(cl_data);
   delay(250);
   I2C_talk_to_clipper(cl_data);
   delay(250);
 }
 
-
-/*
- 
+/* 
 $SDDPT,10.1,-1.5,*62
 $SDDPT,100.7,-1.7,*56
 $SDDPT,0.7,-1.5,*55
@@ -242,7 +230,8 @@ $SDDPT,11.7,-1.5,*65
 $SDDPT,78,-1.5,*73
 $SDDPT,198.7,-1.5,*55
 $SDDPT,1.5,-1.5,*56
-
+$SDDPT,999,-1.7,*47
+$SDDPT,94,-1.7,*73
 */
 
 
