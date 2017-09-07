@@ -80,6 +80,7 @@ void setup()
 
 void I2C_start()
 {
+  // start is sda dropping while scl is high
   digitalWrite(I2C_SCL, HIGH);   // sets the pin on
   delayMicroseconds(1);
   digitalWrite(I2C_SDA, LOW);   // sets the pin on
@@ -91,6 +92,7 @@ void I2C_start()
 
 void I2C_stop()
 {
+  // stop is sda rising while scl is high
   digitalWrite(I2C_SCL, HIGH);   // sets the pin on
   delayMicroseconds(3);        // pauses for 50 microseconds 
   digitalWrite(I2C_SDA, HIGH);   // sets the pin on
