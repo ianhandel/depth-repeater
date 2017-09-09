@@ -14,8 +14,12 @@ TinyGPSCustom depthBT(gps, "SDDPT", 1);
 TinyGPSCustom depthOFFSET(gps, "SDDPT", 2);
 
 #define  OK_WAIT 3600
+#define SCL_LOW_SDA_LOW 0x00
+#define SCL_HIGH_SDA_LOW 0x04
+#define SCL_LOW_SDA_HIGH 0x08
+#define SCL_HIGH_SDA_HIGH 0x0C
 
-int I2C_SCL = 12;                 
+int I2C_SCL = 2;                 
 int I2C_SDA = 3;                 
 
 static char cl_data[12] = {0x7c,0xce,0x80,0xe0,0xf8,0x70,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -73,21 +77,26 @@ void setup()
 {
   pinMode(I2C_SCL, OUTPUT);      // sets the digital pin as output
   pinMode(I2C_SDA, OUTPUT);      // sets the digital pin as output
-  digitalWrite(I2C_SCL, HIGH);   // sets the pin on
-  digitalWrite(I2C_SDA, HIGH);   // sets the pin on
+  //digitalWrite(I2C_SCL, HIGH);   // sets the pin on
+  //digitalWrite(I2C_SDA, HIGH);   // sets the pin on
+  PORTD = SCL_HIGH_SDA_LOW;
   Serial.begin(4800);
 }
 
 void I2C_start()
 {
   // start is sda dropping while scl is high
-  digitalWrite(I2C_SCL, HIGH);   // sets the pin on
+  //digitalWrite(I2C_SCL, HIGH);
+  PORTD = PORTD | SCL_HIGH_SDA_LOW
   delayMicroseconds(1);
-  digitalWrite(I2C_SDA, LOW);   // sets the pin on
-  delayMicroseconds(2);        // pauses for 50 microseconds 
-  digitalWrite(I2C_SCL, LOW);   // sets the pin on
+  //digitalWrite(I2C_SDA, LOW);
+  PORTD = PORTD & SCL_HIGH_SDA_LOW;
+  delayMicroseconds(2); 
+  //digitalWrite(I2C_SCL, LOW);
+  PORTD = PORTD & SCL_LOW_SDA_HIGH;
   delayMicroseconds(1);
-  digitalWrite(I2C_SCL, HIGH);   // sets the pin on
+  //digitalWrite(I2C_SCL, HIGH);
+  PORTD = PORTD | SCL_HIGH_SDA_LOW;
 }
 
 void I2C_stop()
