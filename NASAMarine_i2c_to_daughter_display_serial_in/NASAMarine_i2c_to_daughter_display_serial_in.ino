@@ -21,10 +21,12 @@ int I2C_SDA = 3;
 static char cl_data[12] = {0x7c,0xce,0x80,0xe0,0xf8,0x70,0x00,0x00,0x00,0x00,0x00,0x00};
 static char blank_data[12] = {0x7c,0xce,0x80,0xe0,0xf8,0x70,0x00,0x00,0x00,0x00,0x00,0x00};
 static char no_data[12] = {0x7c,0xce,0x80,0xe0,0xf8,0x70,0x10,0x04,0x00,0x00,0x01,0x00};
+static char test_data[12] = {0x7c,0xce,0x80,0xe0,0xf8,0x70,0xff,0xff,0xff,0xff,0xff,0xff};
+
 static long lastDepth = millis() - OK_WAIT;
 static byte num[3] = {0, 0, 0};
 static byte decimal = 1;
-static float depth;
+static float depth = 0;
 
 // digit 8 segment lookups
 char digit3[11][6] = {                   // from https://en.wikipedia.org/wiki/Seven-segment_display
@@ -76,6 +78,11 @@ void setup()
   digitalWrite(I2C_SCL, HIGH);   // sets the pin on
   digitalWrite(I2C_SDA, HIGH);   // sets the pin on
   Serial.begin(4800);
+  delay(100);
+  I2C_talk_to_clipper(test_data);
+  delay(500);
+  I2C_talk_to_clipper(test_data);
+  delay(2000);
 }
 
 void I2C_start()
@@ -134,17 +141,17 @@ void I2C_talk_to_clipper(char *data)
   I2C_writebyte(*ptr++); // =
   I2C_writebyte(*ptr++); // =
   I2C_writebyte(*ptr++); // =
-  delayMicroseconds(325);
+  delayMicroseconds(333);
   I2C_writebyte(*ptr++);
-  delayMicroseconds(325);
+  delayMicroseconds(333);
   I2C_writebyte(*ptr++);
-  delayMicroseconds(325);
+  delayMicroseconds(333);
   I2C_writebyte(*ptr++); // =
-  delayMicroseconds(325);
+  delayMicroseconds(333);
   I2C_writebyte(*ptr++); // =
-  delayMicroseconds(325);
+  delayMicroseconds(333);
   I2C_writebyte(*ptr++); // =
-  delayMicroseconds(325);
+  delayMicroseconds(333);
   I2C_writebyte(*ptr++);
   delayMicroseconds(20);
   I2C_stop();
@@ -199,6 +206,7 @@ void write_depth_invalid(){
 
 void write_depth_valid(){
   depth = atof(depthBT.value()) + atof(depthOFFSET.value());
+  
   depth_to_num();
   
   // Convert num[3] into cl_data for writing to repeater
