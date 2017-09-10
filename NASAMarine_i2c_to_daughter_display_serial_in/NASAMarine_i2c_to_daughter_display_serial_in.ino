@@ -77,30 +77,31 @@ void setup()
 {
   pinMode(I2C_SCL, OUTPUT);      // sets the digital pin as output
   pinMode(I2C_SDA, OUTPUT);      // sets the digital pin as output
-  PORTD = B00001100;
+  PORTD |= SDA_HIGH;
+  PORTD |= SCL_HIGH;
   Serial.begin(4800);
 }
 
 void I2C_start()
 {
   // start is sda dropping while scl is high
-  PORTD = PORTD & SDA_LOW;
-  delayMicroseconds(4); 
-  PORTD = PORTD & SCL_LOW;
-  delayMicroseconds(4);
+  PORTD |= SDA_HIGH;
+  delayMicroseconds(5); 
+  PORTD |= SCL_HIGH;
+  delayMicroseconds(5);
+  PORTD &= SDA_LOW;
+  delayMICROSECONDS(5);
 }
 
 void I2C_stop()
 {
   // stop is sda rising while scl is high
-  delayMicroseconds(4);
-  PORTD = PORTD | SDA_HIGH;
-  delayMicroseconds(4);
-  PORTD = PORTD & SDA_LOW;
-  delayMicroseconds(4);
-  PORTD = PORTD | SCL_HIGH;
-  delayMicroseconds(4);        // pauses for 50 microseconds 
-  PORTD = PORTD | SDA_HIGH;
+  PORTD &= SDA_LOW;
+  delayMicroseconds(5);
+  PORTD |= SCL_HIGH;
+  delayMicroseconds(5);
+  PORTD |= SDA_HIGH;
+  delayMicroseconds(5);
 }
 
 void I2C_writebyte(byte data)
@@ -113,28 +114,27 @@ void I2C_writebyte(byte data)
      sending = (data >> i) & 0x01;
      delayMicroseconds(4);
      if(sending){
-      PORTD = PORTD | SDA_HIGH;
+      PORTD |= SDA_HIGH;
       //Serial.print(1);
      }else{
-      PORTD = PORTD & SDA_LOW;
+      PORTD &= SDA_LOW;
       //Serial.print(0);
      }
-     //digitalWrite(I2C_SDA, sending);
-     delayMicroseconds(4);
-     PORTD = PORTD | SCL_HIGH;
-     delayMicroseconds(4);
-     PORTD = PORTD & SCL_LOW;
+     delayMicroseconds(5);
+     PORTD |= SCL_HIGH;
+     delayMicroseconds(5);
+     PORTD &= SCL_LOW;
+    delayMicroseconds(5);
   }
   // write ack
-  delayMicroseconds(4);
-  PORTD = PORTD & SDA_LOW;
-  delayMicroseconds(4);
-  PORTD = PORTD | SCL_HIGH;
-  delayMicroseconds(4);
-  PORTD = PORTD & SCL_LOW;
-  delayMicroseconds(4);
-  PORTD = PORTD | SDA_HIGH;
-  delayMicroseconds(4);
+  PORTD &= SDA_LOW;
+  delayMicroseconds(5);
+  PORTD |= SCL_HIGH;
+  delayMicroseconds(5);
+  PORTD |= SCL_LOW;
+  delayMicroseconds(5);
+  PORTD |= SDA_HIGH;
+  delayMicroseconds(5);
 }
 
 void I2C_talk_to_clipper(char *data)
