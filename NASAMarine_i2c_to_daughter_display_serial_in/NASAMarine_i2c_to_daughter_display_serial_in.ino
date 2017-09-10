@@ -19,6 +19,8 @@ TinyGPSCustom depthOFFSET(gps, "SDDPT", 2);
 #define SDA_LOW  B11110111
 #define SDA_HIGH B00001000
 
+#define write_delay 9
+
 int I2C_SCL = 2;                 
 int I2C_SDA = 3;                 
 
@@ -86,22 +88,22 @@ void I2C_start()
 {
   // start is sda dropping while scl is high
   PORTD |= SDA_HIGH;
-  delayMicroseconds(5); 
+  delayMicroseconds(write_delay); 
   PORTD |= SCL_HIGH;
-  delayMicroseconds(5);
+  delayMicroseconds(write_delay);
   PORTD &= SDA_LOW;
-  delayMICROSECONDS(5);
+  delayMicroseconds(write_delay);
 }
 
 void I2C_stop()
 {
   // stop is sda rising while scl is high
   PORTD &= SDA_LOW;
-  delayMicroseconds(5);
+  delayMicroseconds(write_delay);
   PORTD |= SCL_HIGH;
-  delayMicroseconds(5);
+  delayMicroseconds(write_delay);
   PORTD |= SDA_HIGH;
-  delayMicroseconds(5);
+  delayMicroseconds(write_delay);
 }
 
 void I2C_writebyte(byte data)
@@ -112,7 +114,7 @@ void I2C_writebyte(byte data)
   for(i=7;i>=0;i--)
   {
      sending = (data >> i) & 0x01;
-     delayMicroseconds(4);
+     delayMicroseconds(write_delay - 1);
      if(sending){
       PORTD |= SDA_HIGH;
       //Serial.print(1);
@@ -120,21 +122,21 @@ void I2C_writebyte(byte data)
       PORTD &= SDA_LOW;
       //Serial.print(0);
      }
-     delayMicroseconds(5);
+     delayMicroseconds(write_delay);
      PORTD |= SCL_HIGH;
-     delayMicroseconds(5);
+     delayMicroseconds(write_delay);
      PORTD &= SCL_LOW;
-    delayMicroseconds(5);
+    delayMicroseconds(write_delay);
   }
   // write ack
   PORTD &= SDA_LOW;
-  delayMicroseconds(5);
+  delayMicroseconds(write_delay);
   PORTD |= SCL_HIGH;
-  delayMicroseconds(5);
+  delayMicroseconds(write_delay);
   PORTD |= SCL_LOW;
-  delayMicroseconds(5);
+  delayMicroseconds(write_delay);
   PORTD |= SDA_HIGH;
-  delayMicroseconds(5);
+  delayMicroseconds(write_delay);
 }
 
 void I2C_talk_to_clipper(char *data)
