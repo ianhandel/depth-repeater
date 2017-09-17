@@ -14,6 +14,7 @@ TinyGPSCustom depthBT(gps, "SDDPT", 1);
 TinyGPSCustom depthOFFSET(gps, "SDDPT", 2);
 
 #define  OK_WAIT 3600
+#define RE_PIN 2
 
 int I2C_SCL = 12;                 
 int I2C_SDA = 3;                 
@@ -75,8 +76,10 @@ void setup()
 {
   pinMode(I2C_SCL, OUTPUT);      // sets the digital pin as output
   pinMode(I2C_SDA, OUTPUT);      // sets the digital pin as output
+  pinMode(RE_PIN, OUTPUT);
   digitalWrite(I2C_SCL, HIGH);   // sets the pin on
   digitalWrite(I2C_SDA, HIGH);   // sets the pin on
+  digitalWrite(RE_PIN, LOW);
   Serial.begin(4800);
   delay(100);
   I2C_talk_to_clipper(test_data);
