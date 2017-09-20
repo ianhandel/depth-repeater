@@ -1,13 +1,15 @@
 
 void setup() {
   Serial.begin(4800);
+  pinMode(12, OUTPUT);
+  digitalWrite(12, HIGH);
 }
 
 void loop() {
   
-  //Serial.println("$SDDPT,10.1,-1.5,*62");
+  Serial.println("$SDDPT,10.1,-1.5,*62");
   
-  delay(3000);
+  delay(1000);
 }
 
 /*
