@@ -13,11 +13,11 @@ TinyGPSPlus gps;
 TinyGPSCustom depthBT(gps, "SDDPT", 1);
 TinyGPSCustom depthOFFSET(gps, "SDDPT", 2);
 
-#define  OK_WAIT 3600
-#define RE_PIN 2
+#define OK_WAIT 3600
+#define RE_PIN 4
 
-int I2C_SCL = 12;                 
-int I2C_SDA = 3;                 
+int I2C_SCL = 3; // RED                
+int I2C_SDA = 2; // WHITE                
 
 static char cl_data[12] = {0x7c,0xce,0x80,0xe0,0xf8,0x70,0x00,0x00,0x00,0x00,0x00,0x00};
 static char blank_data[12] = {0x7c,0xce,0x80,0xe0,0xf8,0x70,0x00,0x00,0x00,0x00,0x00,0x00};
