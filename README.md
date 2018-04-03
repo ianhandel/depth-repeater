@@ -1,5 +1,7 @@
 # depth-repeater
 
+NB - unreliable due to arduino timings, buyer beware!
+
 Code to read output from chartplotter (NMEA DPT sentence)
 
 [Arduino code](https://github.com/ianhandel/depth-repeater/blob/master/NASAMarine_i2c_to_daughter_display_serial_in/NASAMarine_i2c_to_daughter_display_serial_in.ino)
@@ -19,4 +21,5 @@ See... http://wiki.openseamap.org/wiki/De:NASA_Clipper_Range
 ![](depth-repeater-board_schem.png)
 
 white lead - SDA
-read lead - SCL
+
+red lead - SCL
