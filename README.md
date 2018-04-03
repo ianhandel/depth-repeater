@@ -17,3 +17,6 @@ See... http://wiki.openseamap.org/wiki/De:NASA_Clipper_Range
 ![](depth-repeater-board_bb.png)
 
 ![](depth-repeater-board_schem.png)
+
+white lead - SDA
+read lead - SCL
