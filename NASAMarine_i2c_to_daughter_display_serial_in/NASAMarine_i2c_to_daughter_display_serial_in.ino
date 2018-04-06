@@ -24,6 +24,7 @@ static char blank_data[12] = {0x7c,0xce,0x80,0xe0,0xf8,0x70,0x00,0x00,0x00,0x00,
 static char no_data[12] = {0x7c,0xce,0x80,0xe0,0xf8,0x70,0x10,0x04,0x00,0x00,0x01,0x00};
 static char test_data[12] = {0x7c,0xce,0x80,0xe0,0xf8,0x70,0xff,0xff,0xff,0xff,0xff,0xff};
 
+
 static long lastDepth = millis() - OK_WAIT;
 static byte num[3] = {0, 0, 0};
 static byte decimal = 1;
@@ -31,7 +32,7 @@ static float depth = 0;
 
 // digit 8 segment lookups
 char digit3[11][6] = {                   // from https://en.wikipedia.org/wiki/Seven-segment_display
-                   { 0, 0xbb,0,0,0,0  }, // zero, a,b,c,d,e,f,/g
+                   { 0, 0xbb, 0,0,0,0 }, // zero, a,b,c,d,e,f,/g
                    { 0, 0x11, 0,0,0,0 }, // one /a,b,c,/d,/e,/f,/g
                    { 0, 0x9e, 0,0,0,0 }, // two a,b,/c,d,e,/f,g
                    { 0, 0x97, 0,0,0,0 }, // three a,b,c,d,/e,/f,g
@@ -45,7 +46,7 @@ char digit3[11][6] = {                   // from https://en.wikipedia.org/wiki/S
                  };
                  
 char digit2[11][6] = {                   // from https://en.wikipedia.org/wiki/Seven-segment_display
-                   { 0xee, 0, 0,0,0,0  },// zero, a,b,c,d,e,f,/g
+                   { 0xee, 0, 0,0,0,0 },// zero, a,b,c,d,e,f,/g
                    { 0x44, 0, 0,0,0,0 }, // one /a,b,c,/d,/e,/f,/g
                    { 0xb6, 0, 0,0,0,0 }, // two a,b,/c,d,e,/f,g
                    { 0xd6, 0, 0,0,0,0 }, // three a,b,c,d,/e,/f,g
@@ -235,6 +236,7 @@ void write_depth_valid(){
 //  delay(40);
   I2C_talk_to_clipper(cl_data);
   delay(250);
+  cl_data[6] = cl_data[6] & 0xFE;
   I2C_talk_to_clipper(cl_data);
   delay(250);
 }
