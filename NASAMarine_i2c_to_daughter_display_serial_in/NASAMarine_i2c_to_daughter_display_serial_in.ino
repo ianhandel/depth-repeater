@@ -13,7 +13,7 @@ TinyGPSPlus gps;
 TinyGPSCustom depthBT(gps, "SDDPT", 1);
 TinyGPSCustom depthOFFSET(gps, "SDDPT", 2);
 
-#define OK_WAIT 3600
+#define OK_WAIT 1000
 #define RE_PIN 4
 
 int I2C_SCL = 3; // RED                
@@ -86,6 +86,10 @@ void setup()
   delay(500);
   I2C_talk_to_clipper(test_data);
   delay(2000);
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+  digitalWrite(4, LOW);   
+  digitalWrite(5, LOW);
 }
 
 void I2C_start()
