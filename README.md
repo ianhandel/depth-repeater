@@ -1,6 +1,6 @@
 # depth-repeater
 
-NB - unreliable due to arduino timings, buyer beware!
+NB - potentially unreliable due to arduino timings, buyer beware!
 
 Code to read output from chartplotter (NMEA DPT sentence)
 
@@ -15,10 +15,6 @@ Then write out to NASA Depth Repeater
 I2C bit banging and 7 segment code from modified from Peter Holtermann
 
 See... http://wiki.openseamap.org/wiki/De:NASA_Clipper_Range
-
-![](depth-repeater-board_bb.png)
-
-![](depth-repeater-board_schem.png)
 
 white lead - SDA
 
