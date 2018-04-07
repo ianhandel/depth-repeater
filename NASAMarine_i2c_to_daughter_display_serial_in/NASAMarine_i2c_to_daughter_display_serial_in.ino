@@ -13,8 +13,9 @@ TinyGPSPlus gps;
 TinyGPSCustom depthBT(gps, "SDDPT", 1);
 TinyGPSCustom depthOFFSET(gps, "SDDPT", 2);
 
-#define OK_WAIT 1000
+#define OK_WAIT 2000
 #define RE_PIN 4
+#define DE_PIN 5
 
 int I2C_SCL = 3; // RED                
 int I2C_SDA = 2; // WHITE                
@@ -78,19 +79,17 @@ void setup()
   pinMode(I2C_SCL, OUTPUT);      // sets the digital pin as output
   pinMode(I2C_SDA, OUTPUT);      // sets the digital pin as output
   pinMode(RE_PIN, OUTPUT);
+  pinMODE(DE_PIN, OUTPUT);
   digitalWrite(I2C_SCL, HIGH);   // sets the pin on
   digitalWrite(I2C_SDA, HIGH);   // sets the pin on
   digitalWrite(RE_PIN, LOW);
+  digitalWRITE(DE_PIN, LOW);
   Serial.begin(4800);
   delay(100);
   I2C_talk_to_clipper(test_data);
   delay(500);
   I2C_talk_to_clipper(test_data);
   delay(2000);
-  pinMode(4, OUTPUT);
-  pinMode(5, OUTPUT);
-  digitalWrite(4, LOW);   
-  digitalWrite(5, LOW);
 }
 
 void I2C_start()
@@ -144,21 +143,21 @@ void I2C_talk_to_clipper(char *data)
   ptr = data;
   I2C_start();
   I2C_writebyte(*ptr++); 
-  I2C_writebyte(*ptr++); // =   
-  I2C_writebyte(*ptr++); // =
-  I2C_writebyte(*ptr++); // =
-  I2C_writebyte(*ptr++); // =
-  I2C_writebyte(*ptr++); // =
+  I2C_writebyte(*ptr++);
+  I2C_writebyte(*ptr++);
+  I2C_writebyte(*ptr++);
+  I2C_writebyte(*ptr++);
+  I2C_writebyte(*ptr++);
+  delayMicroseconds(333);
+  I2C_writebyte(*ptr++);
   delayMicroseconds(333);
   I2C_writebyte(*ptr++);
   delayMicroseconds(333);
   I2C_writebyte(*ptr++);
   delayMicroseconds(333);
-  I2C_writebyte(*ptr++); // =
+  I2C_writebyte(*ptr++);
   delayMicroseconds(333);
-  I2C_writebyte(*ptr++); // =
-  delayMicroseconds(333);
-  I2C_writebyte(*ptr++); // =
+  I2C_writebyte(*ptr++);
   delayMicroseconds(333);
   I2C_writebyte(*ptr++);
   delayMicroseconds(20);
@@ -232,8 +231,7 @@ void write_depth_valid(){
     cl_data[9] = cl_data[9] | 0x80;
   }
 
-//  I2C_talk_to_clipper(blank_data);
-//  delay(40);
+  // write depth and flash 'DEPTH' to show it's live
   I2C_talk_to_clipper(cl_data);
   delay(250);
   cl_data[6] = cl_data[6] & 0xFE;
@@ -242,6 +240,8 @@ void write_depth_valid(){
 }
 
 /* 
+testing data
+
 $SDDPT,10.1,-1.5,*62
 $SDDPT,100.7,-1.7,*56
 $SDDPT,0.7,-1.5,*55
