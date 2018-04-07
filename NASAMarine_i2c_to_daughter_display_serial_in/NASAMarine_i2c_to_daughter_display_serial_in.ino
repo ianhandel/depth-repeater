@@ -231,9 +231,13 @@ void write_depth_valid(){
     cl_data[9] = cl_data[9] | 0x80;
   }
 
+<<<<<<< HEAD
   //Serial.println(atof(depthBT.value()));
   //Serial.println(millis());
   // write depth and flash 'DEPTH' to show it's live
+=======
+  // write depth and flash bar at bottom to show it's live
+>>>>>>> 67f2a0318a46bbb29cd62bc51be5ec2b94501a6e
   I2C_talk_to_clipper(cl_data);
   delay(100);
   cl_data[11] = cl_data[11] | 0x02;
