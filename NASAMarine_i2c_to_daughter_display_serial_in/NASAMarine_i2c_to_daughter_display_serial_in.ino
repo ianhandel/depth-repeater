@@ -79,7 +79,7 @@ void setup()
   pinMode(I2C_SCL, OUTPUT);      // sets the digital pin as output
   pinMode(I2C_SDA, OUTPUT);      // sets the digital pin as output
   pinMode(RE_PIN, OUTPUT);
-  pinMODE(DE_PIN, OUTPUT);
+  pinMode(DE_PIN, OUTPUT);
   digitalWrite(I2C_SCL, HIGH);   // sets the pin on
   digitalWrite(I2C_SDA, HIGH);   // sets the pin on
   digitalWrite(RE_PIN, LOW);
@@ -234,7 +234,7 @@ void write_depth_valid(){
   // write depth and flash 'DEPTH' to show it's live
   I2C_talk_to_clipper(cl_data);
   delay(250);
-  cl_data[6] = cl_data[6] & 0xFE;
+  cl_data[11] = cl_data[11] | 0x02;
   I2C_talk_to_clipper(cl_data);
   delay(250);
 }
