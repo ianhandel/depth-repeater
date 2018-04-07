@@ -231,7 +231,7 @@ void write_depth_valid(){
     cl_data[9] = cl_data[9] | 0x80;
   }
 
-  // write depth and flash 'DEPTH' to show it's live
+  // write depth and flash bar at bottom to show it's live
   I2C_talk_to_clipper(cl_data);
   delay(250);
   cl_data[11] = cl_data[11] | 0x02;
