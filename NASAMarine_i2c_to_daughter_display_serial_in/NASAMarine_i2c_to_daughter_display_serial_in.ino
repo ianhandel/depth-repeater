@@ -83,7 +83,7 @@ void setup()
   digitalWrite(I2C_SCL, HIGH);   // sets the pin on
   digitalWrite(I2C_SDA, HIGH);   // sets the pin on
   digitalWrite(RE_PIN, LOW);
-  digitalWRITE(DE_PIN, LOW);
+  digitalWrite(DE_PIN, LOW);
   Serial.begin(4800);
   delay(100);
   I2C_talk_to_clipper(test_data);
