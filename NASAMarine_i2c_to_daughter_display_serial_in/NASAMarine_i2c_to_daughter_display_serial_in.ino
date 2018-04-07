@@ -30,6 +30,7 @@ static long lastDepth = millis() - OK_WAIT;
 static byte num[3] = {0, 0, 0};
 static byte decimal = 1;
 static float depth = 0;
+static int flash;
 
 // digit 8 segment lookups
 char digit3[11][6] = {                   // from https://en.wikipedia.org/wiki/Seven-segment_display
@@ -233,9 +234,12 @@ void write_depth_valid(){
 
 
   // write depth and flash bar at bottom to show it's live
+  if(flash % 4 == 0) {
+    cl_data[11] = cl_data[11] | 0x02;
+  }
+      flash = (flash + 1) % 4;
   I2C_talk_to_clipper(cl_data);
   delay(100);
-  cl_data[11] = cl_data[11] | 0x02;
   I2C_talk_to_clipper(cl_data);
   delay(100);
 }
