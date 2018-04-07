@@ -168,7 +168,7 @@ void depth_to_num() {
   if(depth < 0) depth = 0;
 
   if(((int)depth/100)%10 == 0){
-    depth = depth * 10;
+    depth = round(depth * 10);
     decimal = 1;
   }else{
     decimal = 0;
@@ -231,12 +231,14 @@ void write_depth_valid(){
     cl_data[9] = cl_data[9] | 0x80;
   }
 
+  //Serial.println(atof(depthBT.value()));
+  //Serial.println(millis());
   // write depth and flash 'DEPTH' to show it's live
   I2C_talk_to_clipper(cl_data);
-  delay(250);
+  delay(100);
   cl_data[11] = cl_data[11] | 0x02;
   I2C_talk_to_clipper(cl_data);
-  delay(250);
+  delay(100);
 }
 
 /* 

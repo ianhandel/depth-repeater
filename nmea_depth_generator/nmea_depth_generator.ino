@@ -13,7 +13,7 @@ String units = "N";
 String valid = "A";
 String msg = "";
 float DBT = 0;
-float delta = 1;
+float delta = 0.1;
 
 
 // the setup function runs once when you press reset or power the board
@@ -30,19 +30,23 @@ void loop() {
   float offset = 0;
   msg = cmd + delim + DBT + delim + offset + delim + valid + splat;
   outputMsg(msg);
-  delay(1000);
+  delay(500);
   DBT = DBT + delta;
-  if(DBT >= 20){
+  if(DBT > 3 & delta == 0.1){
+    delta = 1;
+    DBT = round(DBT);
+  } 
+  if(DBT >= 20 & delta == 1){
     delta = 10;
   }
-  if(DBT >= 150){
+  if(DBT >= 250){
     delta = -10;
   }
   if(DBT <= 20 & delta == -10){
     delta = -1;
   }
 if(DBT <= 0){
-    delta = 1;
+    delta = 0.1;
   }
 }
 
